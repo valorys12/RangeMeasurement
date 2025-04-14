@@ -1,7 +1,7 @@
 import cv2, time, os, tensorflow as tf
 import numpy as np
 from tensorflow.python.keras.utils.data_utils import get_file
-
+from cvzone.FaceMeshModule import FaceMeshDetector
 np.random.seed(123)
 
 class Detector:
@@ -10,6 +10,9 @@ class Detector:
         self.colorList = None
         self.model = None
         self.modelName = ""
+        self.faceMesh = FaceMeshDetector(maxFaces=1)
+        self.focalLength = 1600
+        self.realFaceWidth = 6.3
     
     def readClasses(self, classesFilePath):
         with open(classesFilePath, 'r') as f:
@@ -100,16 +103,20 @@ class Detector:
                 distance_text = "N/A"
                 
                 # Get reference data for the detected object
-                ref_data = REFERENCE_SIZES.get(classLabelText, REFERENCE_SIZES["default"])
-                
-                try:
-                    if ref_data["type"] == "height":
-                        distance = (ref_data["ref_px"] * ref_data["ref_distance"]) / bbox_height
-                    else:  # width
-                        distance = (ref_data["ref_px"] * ref_data["ref_distance"]) / bbox_width
+                imgForFace, faces = self.faceMesh.findFaceMesh(image.copy(), draw=False)
+
+                if faces:
+                    face = faces[0]
+                    pointLeft = face[145]
+                    pointRight = face[374]
+                    w, _ = self.faceMesh.findDistance(pointLeft, pointRight)
                     
-                    distance_text = f"{distance:.2f}m"
-                except ZeroDivisionError:
+                    try:
+                        distance = (self.realFaceWidth * self.focalLength) / w
+                        distance_text = f"{int(distance)}cm"
+                    except ZeroDivisionError:
+                        distance_text = "N/A"
+                else:
                     distance_text = "N/A"
                 
                 displayText = f'{classLabelText}: {distance_text}'
