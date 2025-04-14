@@ -2,6 +2,10 @@ import cv2, time, os, tensorflow as tf
 import numpy as np
 from tensorflow.python.keras.utils.data_utils import get_file
 from cvzone.FaceMeshModule import FaceMeshDetector
+import pyttsx3
+from threading import Thread
+import time
+
 np.random.seed(123)
 
 class Detector:
@@ -13,6 +17,14 @@ class Detector:
         self.faceMesh = FaceMeshDetector(maxFaces=1)
         self.focalLength = 1600
         self.realFaceWidth = 6.3
+        self.distance = 0.0
+
+        self.ttsEngine = pyttsx3.init()
+
+    
+    def play_warning(self, engine, message):
+        engine.say(message)
+        engine.runAndWait()
     
     def readClasses(self, classesFilePath):
         with open(classesFilePath, 'r') as f:
@@ -99,9 +111,9 @@ class Detector:
                 bbox_height = ymax_px - ymin_px
                 
                 # Initialize default distance
-                distance = 0.0
-                distance_text = "N/A"
                 
+                distance_text = "N/A"
+                warning_text = ""
                 # Get reference data for the detected object
                 imgForFace, faces = self.faceMesh.findFaceMesh(image.copy(), draw=False)
 
@@ -112,8 +124,19 @@ class Detector:
                     w, _ = self.faceMesh.findDistance(pointLeft, pointRight)
                     
                     try:
-                        distance = (self.realFaceWidth * self.focalLength) / w
-                        distance_text = f"{int(distance)}cm"
+                        self.distance = (self.realFaceWidth * self.focalLength) / w
+                        distance_text = f"{self.distance / 100:.2f}m"
+                        
+                        if self.distance <= 100:
+                            warning_text = f"Warning: {classLabelText} Is Too Close"
+                            # Draw the warning text on the image at a position relative to the bounding box
+                            cv2.putText(image, warning_text, (xmin_px, ymin_px - 40),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                            if not hasattr(self, 'sound_thread') or not self.sound_thread.is_alive():
+                                warning_message = f"Warning: {classLabelText} is too close"
+                                self.sound_thread = Thread(target=self.play_warning, args=(self.ttsEngine, warning_message))
+                                self.sound_thread.start()
+                            
                     except ZeroDivisionError:
                         distance_text = "N/A"
                 else:
@@ -126,7 +149,7 @@ class Detector:
                             color=classColor, thickness=2)
                 cv2.putText(image, displayText, (xmin_px, ymin_px-10),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, classColor, 2)
-        
+
         return image
     
     def predictVideo(self, videoPath, threshold=0.5):
@@ -166,7 +189,7 @@ class Detector:
                 
                 # Process frame
                 processedFrame = self.createBoundingBox(frame, threshold)
-                
+
                 # Tampilkan frame fullscreen
                 cv2.imshow("Object Detection", processedFrame)
                 
