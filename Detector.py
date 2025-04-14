@@ -18,8 +18,9 @@ class Detector:
         self.focalLength = 1600
         self.realFaceWidth = 6.3
         self.distance = 0.0
-
         self.ttsEngine = pyttsx3.init()
+        self.voices = self.ttsEngine.getProperty('voices')
+        self.ttsEngine.setProperty('voice', self.voices[1].id)
 
     
     def play_warning(self, engine, message):
