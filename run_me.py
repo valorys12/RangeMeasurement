@@ -1,8 +1,10 @@
 from Detector import *
+import os
 
 # Configuration
 modelURL = "http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_320x320_coco17_tpu-8.tar.gz"
-classFile = "coco.names"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+classFile = os.path.join(BASE_DIR, "coco.names")
 threshold = 0.5
 videoPath = 0  # 0 for webcam
 

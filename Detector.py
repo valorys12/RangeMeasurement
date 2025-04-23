@@ -9,6 +9,7 @@ import time
 np.random.seed(123)
 
 class Detector:
+    
     def __init__(self):
         self.classesList = None
         self.colorList = None
