@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import subprocess
 import os
 
@@ -12,7 +13,12 @@ def on_start():
         font=("Helvetica", 16, "bold"),
         fg="black"
     )
-    loading_label.pack(expand=True, pady=50)
+    loading_label.pack(pady=20)
+
+    progress = ttk.Progressbar(main_frame, orient="horizontal", length=300, mode="indeterminate")
+    progress.pack(pady=10)
+    progress.start()
+
     window.update_idletasks()
 
     try:
@@ -21,9 +27,10 @@ def on_start():
         if os.name == 'nt':
             subprocess.Popen(['python', script_path], shell=True)
 
-        window.after(15000, window.destroy)
+        window.after(15000, lambda: finish_loading(progress, loading_label))
 
     except Exception as e:
+        progress.stop()
         loading_label.config(text=f"Error: {str(e)}\nPlease check if run_me.py exists", fg="red")
         retry_button = tk.Button(
             main_frame,
@@ -33,6 +40,19 @@ def on_start():
             bg="lightgray"
         )
         retry_button.pack(pady=20)
+
+def finish_loading(progress, loading_label):
+    progress.stop()
+    loading_label.config(text="Process Completed!", fg="green")
+    exit_button = tk.Button(
+        main_frame,
+        text="Exit",
+        command=window.destroy,
+        font=("Helvetica", 12),
+        bg="red",
+        fg="white"
+    )
+    exit_button.pack(pady=20)
 
 window = tk.Tk()
 window.title("Contoh Tkinter")
@@ -61,4 +81,4 @@ start_button = tk.Button(
 )
 start_button.pack(expand=True)
 
-window.mainloop() 
+window.mainloop()
