@@ -16,7 +16,7 @@ Install the required libraries:
 
 ```bash
 pip install opencv-python numpy mediapipe cvzone pyttsx3 time tensorflow
-
+```
 
 ## 🚀 Usage
 
@@ -24,6 +24,7 @@ Run the main script:
 
 ```bash
 python run_me.py
+```
 
 ## 👥 Project Members
 
