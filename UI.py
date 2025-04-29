@@ -115,7 +115,7 @@ def on_start():
         script_path = os.path.join(os.path.dirname(__file__), "run_me.py")
         if os.name == 'nt':
             subprocess.Popen(['python', script_path], shell=True)
-        window.after(15000, lambda: finish_loading(progress, loading_label))
+        window.after(20000, lambda: finish_loading(progress, loading_label))
     except Exception as e:
         progress.stop()
         loading_label.config(text=f"Error: {str(e)}\nPlease check if run_me.py exists", fg="red")
