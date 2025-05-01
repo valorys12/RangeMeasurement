@@ -5,8 +5,8 @@ A Python-based object detection and distance estimation tool using OpenCV and Te
 ## Repository Structure
 
 - `RangeMeasurement/`
-  - `main.py`: Main script for running the object detection and distance estimation
-  - `requirements.txt`: List of required Python libraries
+  - `UI.py`: Main script for running the object detection and distance estimation
+  - `run_me.py`: Script for object detection and distance estimation
   - `README.md`: Project documentation
   - `assets/` *(Optional)*: Directory for storing sample images/videos or other resources
 
@@ -23,7 +23,7 @@ pip install opencv-python numpy mediapipe cvzone pyttsx3 time tensorflow
 Run the main script:
 
 ```bash
-python run_me.py
+python UI.py
 ```
 
 ## 👥 Project Members
